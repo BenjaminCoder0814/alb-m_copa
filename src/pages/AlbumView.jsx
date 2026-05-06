@@ -13,17 +13,21 @@ const BG_DARK = '#011a07';
 function StickerCell({ code, qty, onAdd, onRemove }) {
   const holdRef = useRef(null);
   const didHold = useRef(false);
+  const [holding, setHolding] = useState(false);
 
   const startHold = () => {
     didHold.current = false;
+    setHolding(true);
     holdRef.current = setTimeout(() => {
       didHold.current = true;
+      setHolding(false);
       onRemove(code);
     }, 600);
   };
 
   const endHold = () => {
     clearTimeout(holdRef.current);
+    setHolding(false);
   };
 
   const handleClick = () => {
@@ -54,11 +58,29 @@ function StickerCell({ code, qty, onAdd, onRemove }) {
       onTouchStart={startHold}
       onTouchEnd={endHold}
       onClick={handleClick}
-      style={{ background: bg, border, color: textColor }}
-      className="w-7 h-7 rounded-md text-[10px] font-black flex items-center justify-center shrink-0 select-none transition-all duration-100 active:scale-90 cursor-pointer"
+      style={{ background: bg, border: holding ? '1px solid #ef4444' : border, color: textColor, position: 'relative', overflow: 'hidden' }}
+      className="w-7 h-7 rounded-md text-[10px] font-black flex items-center justify-center shrink-0 select-none transition-colors duration-100 active:scale-90 cursor-pointer"
       title={`${code} — ${!qty ? 'falta' : qty === 1 ? 'tenho' : `repetida x${qty}`}\nClique para adicionar • Segure para remover`}
     >
-      {qty > 1 ? qty : ''}
+      <AnimatePresence>
+        {holding && (
+          <motion.div
+            key="hold-fill"
+            initial={{ scaleX: 0 }}
+            animate={{ scaleX: 1 }}
+            transition={{ duration: 0.6, ease: 'linear' }}
+            style={{
+              position: 'absolute',
+              inset: 0,
+              background: 'rgba(239,68,68,0.55)',
+              transformOrigin: 'left center',
+              zIndex: 0,
+              borderRadius: 'inherit',
+            }}
+          />
+        )}
+      </AnimatePresence>
+      <span style={{ position: 'relative', zIndex: 1 }}>{qty > 1 ? qty : ''}</span>
     </button>
   );
 }
@@ -340,7 +362,7 @@ function Legend() {
         <div className="w-5 h-5 rounded" style={{ background: 'rgba(255,255,255,0.06)', border: '1px solid rgba(255,255,255,0.08)' }} />
         <span className="text-[10px] text-white/50">Falta</span>
       </div>
-      <span className="text-[9px] text-white/25 ml-auto">Segure = remover</span>
+      <span className="text-[9px] ml-auto font-bold" style={{ color: 'rgba(239,68,68,0.6)' }}>🔴 Segure = remover</span>
     </div>
   );
 }

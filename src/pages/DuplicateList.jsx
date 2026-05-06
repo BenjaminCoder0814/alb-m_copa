@@ -8,14 +8,18 @@ const GREEN = '#009C3B';
 const YELLOW = '#FFDF00';
 
 function TradeModal({ sticker, onClose, onTrade }) {
+  const [giveCode, setGiveCode] = useState(sticker.code);
   const [receiveCode, setReceiveCode] = useState('');
   const [result, setResult] = useState(null);
-  const normalized = receiveCode.trim().toUpperCase();
-  const isValid = !!STICKER_MAP[normalized];
+  const normalizedGive = giveCode.trim().toUpperCase();
+  const normalizedReceive = receiveCode.trim().toUpperCase();
+  const isGiveValid = !!STICKER_MAP[normalizedGive];
+  const isReceiveValid = !!STICKER_MAP[normalizedReceive];
+  const canConfirm = isGiveValid && normalizedGive && isReceiveValid && normalizedReceive;
 
   const handleTrade = () => {
-    if (!normalized || !isValid) return;
-    const res = onTrade(sticker.code, normalized);
+    if (!canConfirm) return;
+    const res = onTrade(normalizedGive, normalizedReceive);
     setResult(res);
   };
 
@@ -43,39 +47,52 @@ function TradeModal({ sticker, onClose, onTrade }) {
         </div>
 
         {/* Give */}
-        <div className="rounded-2xl p-3.5" style={{ background: 'rgba(239,68,68,0.1)', border: '1px solid rgba(239,68,68,0.25)' }}>
-          <p className="text-xs font-bold uppercase tracking-widest mb-1" style={{ color: 'rgba(239,68,68,0.7)' }}>Voce DAR</p>
-          <div className="flex items-center gap-2">
-            <span className="text-xl">{TEAMS[sticker.country]?.flag}</span>
-            <div>
-              <p className="font-black text-white">{sticker.code}</p>
-              <p className="text-xs" style={{ color: 'rgba(255,255,255,0.35)' }}>{TEAMS[sticker.country]?.name} · {sticker.quantity}x disponivel</p>
-            </div>
-          </div>
+        <div>
+          <p className="text-xs font-bold uppercase tracking-widest mb-2" style={{ color: 'rgba(239,68,68,0.8)' }}>🔴 Você DEU</p>
+          <input
+            value={giveCode}
+            onChange={(e) => { setGiveCode(e.target.value.toUpperCase()); setResult(null); }}
+            placeholder="Codigo da figurinha que você deu..."
+            className="w-full rounded-2xl px-4 py-3 text-sm font-bold outline-none tracking-widest"
+            style={{
+              background: 'rgba(255,255,255,0.07)',
+              border: `2px solid ${isGiveValid && normalizedGive ? 'rgba(239,68,68,0.55)' : 'rgba(255,255,255,0.12)'}`,
+              color: 'white',
+              caretColor: YELLOW,
+            }}
+          />
+          {normalizedGive && !isGiveValid && (
+            <p className="text-xs mt-1.5" style={{ color: '#f87171' }}>Codigo invalido</p>
+          )}
+          {normalizedGive && isGiveValid && (
+            <p className="text-xs mt-1.5" style={{ color: 'rgba(239,68,68,0.8)' }}>
+              {TEAMS[STICKER_MAP[normalizedGive]?.country]?.flag} {STICKER_MAP[normalizedGive]?.countryName} · #{STICKER_MAP[normalizedGive]?.number}
+            </p>
+          )}
         </div>
 
         {/* Receive */}
         <div>
-          <p className="text-xs font-bold uppercase tracking-widest mb-2" style={{ color: `${GREEN}cc` }}>Voce RECEBER</p>
+          <p className="text-xs font-bold uppercase tracking-widest mb-2" style={{ color: `${GREEN}cc` }}>🟢 Você RECEBEU</p>
           <input
             value={receiveCode}
             onChange={(e) => { setReceiveCode(e.target.value.toUpperCase()); setResult(null); }}
-            placeholder="Codigo da figurinha recebida..."
+            placeholder="Codigo da figurinha que você recebeu..."
             className="w-full rounded-2xl px-4 py-3 text-sm font-bold outline-none tracking-widest"
             style={{
               background: 'rgba(255,255,255,0.07)',
-              border: `2px solid ${isValid && normalized ? GREEN + '77' : 'rgba(255,255,255,0.12)'}`,
+              border: `2px solid ${isReceiveValid && normalizedReceive ? GREEN + '77' : 'rgba(255,255,255,0.12)'}`,
               color: 'white',
               caretColor: YELLOW,
             }}
             autoFocus
           />
-          {normalized && !isValid && (
+          {normalizedReceive && !isReceiveValid && (
             <p className="text-xs mt-1.5" style={{ color: '#f87171' }}>Codigo invalido</p>
           )}
-          {normalized && isValid && (
+          {normalizedReceive && isReceiveValid && (
             <p className="text-xs mt-1.5" style={{ color: GREEN }}>
-              {STICKER_MAP[normalized]?.country} - #{STICKER_MAP[normalized]?.number}
+              {TEAMS[STICKER_MAP[normalizedReceive]?.country]?.flag} {STICKER_MAP[normalizedReceive]?.countryName} · #{STICKER_MAP[normalizedReceive]?.number}
             </p>
           )}
         </div>
@@ -109,12 +126,12 @@ function TradeModal({ sticker, onClose, onTrade }) {
           <motion.button
             whileTap={{ scale: 0.96 }}
             onClick={handleTrade}
-            disabled={!isValid || !normalized}
+            disabled={!canConfirm}
             className="py-3 rounded-2xl font-black text-sm flex items-center justify-center gap-2"
             style={{
-              background: (isValid && normalized) ? `linear-gradient(135deg, #005c27, ${GREEN})` : 'rgba(255,255,255,0.05)',
-              color: (isValid && normalized) ? 'white' : 'rgba(255,255,255,0.2)',
-              border: `1px solid ${(isValid && normalized) ? GREEN + '55' : 'rgba(255,255,255,0.07)'}`,
+              background: canConfirm ? `linear-gradient(135deg, #005c27, ${GREEN})` : 'rgba(255,255,255,0.05)',
+              color: canConfirm ? 'white' : 'rgba(255,255,255,0.2)',
+              border: `1px solid ${canConfirm ? GREEN + '55' : 'rgba(255,255,255,0.07)'}`,
             }}
           >
             <ArrowLeftRight size={15} />
