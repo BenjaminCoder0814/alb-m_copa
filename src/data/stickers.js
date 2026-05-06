@@ -9,15 +9,19 @@ export const albumStructure = [
     section: 'Página Inicial',
     type: 'initial',
     stickers: [
-      { code: 'FWC', name: 'FIFA World Cup', flag: '🏆', numbers: [1] },
-      { code: 'MEX', name: 'México',          flag: '🇲🇽', numbers: [1] },
-      { code: 'KOR', name: 'Coreia do Sul',   flag: '🇰🇷', numbers: [1] },
-      { code: 'RSA', name: 'África do Sul',   flag: '🇿🇦', numbers: [1] },
-      { code: 'COC', name: 'Copa Especial',   flag: '🥇', numbers: [1] },
-      { code: 'JPN', name: 'Japão',           flag: '🇯🇵', numbers: [1] },
-      { code: 'CAN', name: 'Canadá',          flag: '🇨🇦', numbers: [1] },
-      { code: 'ECU', name: 'Equador',         flag: '🇪🇨', numbers: [1] },
-      { code: 'QAT', name: 'Catar',           flag: '🇶🇦', numbers: [1] },
+      // ---- FWC (FIFA World Cup History) — 10 figurinhas únicas ----
+      { code: 'FWC', name: 'FIFA World Cup History', flag: '🏆', numbers: ['00', 1, 2, 3, 4, 5, 6, 7, 8, 9] },
+      // ---- Figuras Históricas — 3 fig. cada (displayOnly: compartilham códigos com os grupos) ----
+      { code: 'MEX', name: 'México (Histórico)',    flag: '🇲🇽', numbers: [1, 2, 3], displayOnly: true },
+      { code: 'KOR', name: 'Coreia do Sul (Hist.)', flag: '🇰🇷', numbers: [1, 2, 3], displayOnly: true },
+      { code: 'RSA', name: 'África do Sul (Hist.)', flag: '🇿🇦', numbers: [1, 2, 3], displayOnly: true },
+      // ---- Copa Coca-Cola — 14 figurinhas únicas ----
+      { code: 'COC', name: 'Copa Coca-Cola',        flag: '🥤', numbers: [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14] },
+      // ---- Mais Figuras Históricas ----
+      { code: 'JPN', name: 'Japão (Histórico)',     flag: '🇯🇵', numbers: [1, 2, 3], displayOnly: true },
+      { code: 'CAN', name: 'Canadá (Histórico)',    flag: '🇨🇦', numbers: [1, 2, 3], displayOnly: true },
+      { code: 'ECU', name: 'Equador (Histórico)',   flag: '🇪🇨', numbers: [1, 2, 3], displayOnly: true },
+      { code: 'QAT', name: 'Catar (Histórico)',     flag: '🇶🇦', numbers: [1, 2, 3], displayOnly: true },
     ],
   },
 
@@ -179,7 +183,10 @@ albumStructure.forEach((section) => {
         const key = `${s.code}${n}`;
         const entry = { code: key, country: s.code, countryName: s.name, group: 'INICIAL', number: n, flag: s.flag };
         STICKER_MAP[key] = entry;
-        ALL_STICKERS.push(entry);
+        // displayOnly = figurinha compartilhada com grupo (ex: MEX1–3). Não duplica em ALL_STICKERS.
+        if (!s.displayOnly) {
+          ALL_STICKERS.push(entry);
+        }
       });
     });
   } else {
@@ -213,5 +220,6 @@ albumStructure.forEach((section) => {
   });
 });
 
-// FWC special entry for compatibility
-TEAMS['FWC'] = { name: 'Especiais', flag: '🏆', color: '#C9A84C', count: 1 };
+// FWC e COC special entries for compatibility
+TEAMS['FWC'] = { name: 'FWC History', flag: '🏆', color: '#C9A84C', count: 10 };
+TEAMS['COC'] = { name: 'Copa Coca-Cola', flag: '🥤', color: '#F40000', count: 14 };
