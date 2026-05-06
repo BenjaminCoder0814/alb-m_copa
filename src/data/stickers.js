@@ -11,8 +11,6 @@ export const albumStructure = [
     stickers: [
       // ---- FWC (FIFA World Cup History) — 9 figurinhas da Página Inicial (FWC00–FWC8) ----
       { code: 'FWC', name: 'FIFA World Cup History', flag: '🏆', numbers: ['00', 1, 2, 3, 4, 5, 6, 7, 8] },
-      // ---- Copa Coca-Cola — 14 figurinhas únicas ----
-      { code: 'COC', name: 'Copa Coca-Cola',        flag: '🥤', numbers: [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14] },
     ],
   },
 
@@ -166,6 +164,15 @@ export const albumStructure = [
     type: 'initial',
     stickers: [
       { code: 'FWC', name: 'FIFA World Cup History', flag: '🏆', numbers: [9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19] },
+    ],
+  },
+
+  // ---- COPA COCA-COLA (final do álbum) — COC1 a COC14 ----
+  {
+    section: 'Copa Coca-Cola',
+    type: 'initial',
+    stickers: [
+      { code: 'COC', name: 'Copa Coca-Cola', flag: '🥤', numbers: [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14] },
     ],
   },
 ];
