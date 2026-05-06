@@ -1,4 +1,4 @@
-import { createContext, useContext, useState, useCallback, useEffect } from 'react';
+import { createContext, useContext, useState, useCallback } from 'react';
 import { STICKER_MAP, ALL_STICKERS, GROUPS, TEAMS } from '../data/stickers';
 
 const STORAGE_KEY = 'copa_collection';
@@ -19,12 +19,17 @@ function saveCollection(col) {
 }
 
 export function CollectionProvider({ children }) {
-  const [collection, setCollection] = useState(loadCollection);
+  const [collection, setCollectionRaw] = useState(loadCollection);
   const [lastResult, setLastResult] = useState(null); // {type, codes}
 
-  useEffect(() => {
-    saveCollection(collection);
-  }, [collection]);
+  // Wrapper que garante salvamento síncrono a cada alteração
+  const setCollection = useCallback((updater) => {
+    setCollectionRaw((prev) => {
+      const next = typeof updater === 'function' ? updater(prev) : updater;
+      saveCollection(next);
+      return next;
+    });
+  }, []);
 
   // Parse raw input like "BRA1 BRA2, ARG5 fra10"
   const parseInput = useCallback((raw) => {
