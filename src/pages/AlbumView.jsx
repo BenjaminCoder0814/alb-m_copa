@@ -126,7 +126,7 @@ function InitialSection({ section, collection, onAdd, onRemove, expanded, onTogg
           <span className="text-lg">🏆</span>
           <span className="text-sm font-black text-white">{section.section}</span>
           <span className="text-xs px-2 py-0.5 rounded-full" style={{ background: 'rgba(201,168,76,0.2)', color: '#C9A84C' }}>
-            {section.stickers.length} figurinhas
+            {section.stickers.reduce((a, s) => a + s.numbers.length, 0)} figurinhas
           </span>
         </div>
         {expanded ? <ChevronDown size={16} className="text-white/50" /> : <ChevronRight size={16} className="text-white/50" />}
