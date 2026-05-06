@@ -34,15 +34,37 @@ export function CollectionProvider({ children }) {
         get(ref(db, `colecoes/${user.uid}`)).then((snapshot) => {
           const data = snapshot.val();
           if (data && Object.keys(data).length > 0) {
-            setCollectionRaw(data);
-            saveCollection(data);
+            // Só sobrescreve local se Firebase tiver MAIS dados
+            const localCount = Object.keys(loadCollection()).length;
+            const firebaseCount = Object.keys(data).length;
+            if (firebaseCount >= localCount) {
+              setCollectionRaw(data);
+              saveCollection(data);
+            }
           }
+        }).catch(() => {
+          // Firebase indisponível — mantém localStorage
         });
       } else {
         signInAnonymously(auth);
       }
     });
     return () => unsub();
+  }, []);
+
+  // Recuperar do Firebase manualmente
+  const recoverFromFirebase = useCallback(async () => {
+    if (!uidRef.current) return false;
+    try {
+      const snapshot = await get(ref(db, `colecoes/${uidRef.current}`));
+      const data = snapshot.val();
+      if (data && Object.keys(data).length > 0) {
+        setCollectionRaw(data);
+        saveCollection(data);
+        return Object.keys(data).length;
+      }
+    } catch {}
+    return false;
   }, []);
 
   // Wrapper: salva no localStorage E no Firebase a cada alteração
@@ -249,6 +271,7 @@ export function CollectionProvider({ children }) {
       exportCollection,
       importCollection,
       resetCollection,
+      recoverFromFirebase,
     }}>
       {children}
     </CollectionContext.Provider>

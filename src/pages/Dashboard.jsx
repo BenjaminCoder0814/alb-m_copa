@@ -1,4 +1,5 @@
-﻿import { motion } from 'framer-motion';
+﻿import { useState } from 'react';
+import { motion } from 'framer-motion';
 import { useCollection } from '../store/CollectionContext';
 import { GROUPS, TEAMS } from '../data/stickers';
 import { Trophy, Star, Copy, BookOpen } from 'lucide-react';
@@ -86,11 +87,13 @@ function GroupBar({ group, teams }) {
 }
 
 export default function Dashboard() {
-  const { calculateProgress, getDuplicateStickers, getMissingStickers, getTotalDuplicates } = useCollection();
+  const { calculateProgress, getDuplicateStickers, getMissingStickers, getTotalDuplicates, recoverFromFirebase, exportCollection } = useCollection();
   const { owned, total, percentage: pct } = calculateProgress();
   const dupes = getDuplicateStickers().length;
   const missing = getMissingStickers().length;
   const extraCopies = getTotalDuplicates();
+  const [recovering, setRecovering] = useState(false);
+  const [recoverMsg, setRecoverMsg] = useState(null);
 
   return (
     <div className="pb-6 space-y-5">
@@ -129,6 +132,32 @@ export default function Dashboard() {
         <StatCard icon={<Copy size={18} color={YELLOW} />} label="Tipos repet." value={dupes} color={YELLOW} delay={0.2} />
         <StatCard icon={<Star size={18} color="#f97316" />} label="Copias extras" value={extraCopies} color="#f97316" delay={0.25} />
       </div>
+
+      {/* Banner de recuperação — aparece só quando coleção está vazia */}
+      {owned === 0 && (
+        <motion.div initial={{ opacity: 0, y: -8 }} animate={{ opacity: 1, y: 0 }}
+          className="rounded-2xl p-4 space-y-2"
+          style={{ background: 'rgba(255,223,0,0.08)', border: '1px solid rgba(255,223,0,0.3)' }}>
+          <p className="text-xs font-bold" style={{ color: '#FFDF00' }}>⚠️ Coleção parece vazia</p>
+          <p className="text-[11px] text-white/50">Se você tinha figurinhas e sumiram, tente recuperar do backup na nuvem:</p>
+          <div className="flex gap-2">
+            <button
+              onClick={async () => {
+                setRecovering(true);
+                const count = await recoverFromFirebase();
+                setRecovering(false);
+                setRecoverMsg(count ? `✅ ${count} figurinhas recuperadas!` : '❌ Nenhum backup encontrado.');
+                setTimeout(() => setRecoverMsg(null), 4000);
+              }}
+              disabled={recovering}
+              className="flex-1 py-2 rounded-xl text-xs font-black"
+              style={{ background: 'rgba(255,223,0,0.2)', color: '#FFDF00', border: '1px solid rgba(255,223,0,0.4)' }}>
+              {recovering ? 'Buscando...' : '☁️ Recuperar do Firebase'}
+            </button>
+          </div>
+          {recoverMsg && <p className="text-xs font-bold text-center" style={{ color: recoverMsg.startsWith('✅') ? '#009C3B' : '#ef4444' }}>{recoverMsg}</p>}
+        </motion.div>
+      )}
 
       {/* Progress por grupo */}
       <motion.div
