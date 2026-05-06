@@ -16,7 +16,7 @@ const PAGES = {
   dashboard: Dashboard,
   input: StickerInput,
   album: AlbumView,
-  duplicates: DuplicateList,
+  dupes: DuplicateList,
   missing: MissingList,
   reports: Reports,
 };
