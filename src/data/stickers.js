@@ -11,17 +11,8 @@ export const albumStructure = [
     stickers: [
       // ---- FWC (FIFA World Cup History) — 9 figurinhas da Página Inicial (FWC00–FWC8) ----
       { code: 'FWC', name: 'FIFA World Cup History', flag: '🏆', numbers: ['00', 1, 2, 3, 4, 5, 6, 7, 8] },
-      // ---- Figuras Históricas — 3 fig. cada (displayOnly: compartilham códigos com os grupos) ----
-      { code: 'MEX', name: 'México (Histórico)',    flag: '🇲🇽', numbers: [1, 2, 3], displayOnly: true },
-      { code: 'KOR', name: 'Coreia do Sul (Hist.)', flag: '🇰🇷', numbers: [1, 2, 3], displayOnly: true },
-      { code: 'RSA', name: 'África do Sul (Hist.)', flag: '🇿🇦', numbers: [1, 2, 3], displayOnly: true },
       // ---- Copa Coca-Cola — 14 figurinhas únicas ----
       { code: 'COC', name: 'Copa Coca-Cola',        flag: '🥤', numbers: [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14] },
-      // ---- Mais Figuras Históricas ----
-      { code: 'JPN', name: 'Japão (Histórico)',     flag: '🇯🇵', numbers: [1, 2, 3], displayOnly: true },
-      { code: 'CAN', name: 'Canadá (Histórico)',    flag: '🇨🇦', numbers: [1, 2, 3], displayOnly: true },
-      { code: 'ECU', name: 'Equador (Histórico)',   flag: '🇪🇨', numbers: [1, 2, 3], displayOnly: true },
-      { code: 'QAT', name: 'Catar (Histórico)',     flag: '🇶🇦', numbers: [1, 2, 3], displayOnly: true },
     ],
   },
 
