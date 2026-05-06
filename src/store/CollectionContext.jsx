@@ -1,4 +1,7 @@
-import { createContext, useContext, useState, useCallback } from 'react';
+import { createContext, useContext, useState, useCallback, useEffect, useRef } from 'react';
+import { signInAnonymously, onAuthStateChanged } from 'firebase/auth';
+import { ref, set, get } from 'firebase/database';
+import { auth, db } from '../firebase';
 import { STICKER_MAP, ALL_STICKERS, GROUPS, TEAMS } from '../data/stickers';
 
 const STORAGE_KEY = 'copa_collection';
@@ -21,12 +24,35 @@ function saveCollection(col) {
 export function CollectionProvider({ children }) {
   const [collection, setCollectionRaw] = useState(loadCollection);
   const [lastResult, setLastResult] = useState(null); // {type, codes}
+  const uidRef = useRef(null);
 
-  // Wrapper que garante salvamento síncrono a cada alteração
+  // Login anônimo + carregar coleção do Firebase uma vez
+  useEffect(() => {
+    const unsub = onAuthStateChanged(auth, (user) => {
+      if (user) {
+        uidRef.current = user.uid;
+        get(ref(db, `colecoes/${user.uid}`)).then((snapshot) => {
+          const data = snapshot.val();
+          if (data && Object.keys(data).length > 0) {
+            setCollectionRaw(data);
+            saveCollection(data);
+          }
+        });
+      } else {
+        signInAnonymously(auth);
+      }
+    });
+    return () => unsub();
+  }, []);
+
+  // Wrapper: salva no localStorage E no Firebase a cada alteração
   const setCollection = useCallback((updater) => {
     setCollectionRaw((prev) => {
       const next = typeof updater === 'function' ? updater(prev) : updater;
       saveCollection(next);
+      if (uidRef.current) {
+        set(ref(db, `colecoes/${uidRef.current}`), next);
+      }
       return next;
     });
   }, []);
