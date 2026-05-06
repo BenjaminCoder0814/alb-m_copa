@@ -141,7 +141,9 @@ export function CollectionProvider({ children }) {
 
   const calculateProgress = useCallback(() => {
     const owned = getOwnedCount();
-    return ((owned / ALL_STICKERS.length) * 100).toFixed(1);
+    const total = ALL_STICKERS.length;
+    const percentage = total ? ((owned / total) * 100).toFixed(1) : '0.0';
+    return { owned, total, percentage };
   }, [getOwnedCount]);
 
   const getGroupProgress = useCallback(() => {

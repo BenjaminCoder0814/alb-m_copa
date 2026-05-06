@@ -1,79 +1,217 @@
-// Full FIFA World Cup 2026 sticker dataset
-// Groups A–H, 6 teams per group, 20 stickers per country + special sections
+﻿// Copa do Mundo FIFA 2026 - Estrutura completa do álbum Panini
+// 12 grupos (A-L), 48 seleções, 20 figurinhas por seleção + Página Inicial
 
-export const GROUPS = {
-  A: ['QAT', 'ECU', 'SEN', 'NED'],
-  B: ['ENG', 'IRN', 'USA', 'WAL'],
-  C: ['ARG', 'SAU', 'MEX', 'POL'],
-  D: ['FRA', 'AUS', 'DEN', 'TUN'],
-  E: ['ESP', 'CRC', 'GER', 'JPN'],
-  F: ['BEL', 'CAN', 'MAR', 'CRO'],
-  G: ['BRA', 'SRB', 'CHE', 'CMR'],
-  H: ['POR', 'GHA', 'URU', 'KOR'],
-};
+// --------------------------------------------------------------------------
+// Estrutura principal do álbum
+// --------------------------------------------------------------------------
+export const albumStructure = [
+  {
+    section: 'Página Inicial',
+    type: 'initial',
+    stickers: [
+      { code: 'FWC', name: 'FIFA World Cup', flag: '🏆', numbers: [1] },
+      { code: 'MEX', name: 'México',          flag: '🇲🇽', numbers: [1] },
+      { code: 'KOR', name: 'Coreia do Sul',   flag: '🇰🇷', numbers: [1] },
+      { code: 'RSA', name: 'África do Sul',   flag: '🇿🇦', numbers: [1] },
+      { code: 'COC', name: 'Copa Especial',   flag: '🥇', numbers: [1] },
+      { code: 'JPN', name: 'Japão',           flag: '🇯🇵', numbers: [1] },
+      { code: 'CAN', name: 'Canadá',          flag: '🇨🇦', numbers: [1] },
+      { code: 'ECU', name: 'Equador',         flag: '🇪🇨', numbers: [1] },
+      { code: 'QAT', name: 'Catar',           flag: '🇶🇦', numbers: [1] },
+    ],
+  },
 
-export const TEAMS = {
-  QAT: { name: 'Qatar', flag: '🇶🇦', color: '#8B0000', count: 20 },
-  ECU: { name: 'Equador', flag: '🇪🇨', color: '#FFD700', count: 20 },
-  SEN: { name: 'Senegal', flag: '🇸🇳', color: '#00853F', count: 20 },
-  NED: { name: 'Holanda', flag: '🇳🇱', color: '#FF4500', count: 20 },
-  ENG: { name: 'Inglaterra', flag: '🏴󠁧󠁢󠁥󠁮󠁧󠁿', color: '#CF081F', count: 20 },
-  IRN: { name: 'Irã', flag: '🇮🇷', color: '#239F40', count: 20 },
-  USA: { name: 'Estados Unidos', flag: '🇺🇸', color: '#002868', count: 20 },
-  WAL: { name: 'País de Gales', flag: '🏴󠁧󠁢󠁷󠁬󠁳󠁿', color: '#C8102E', count: 20 },
-  ARG: { name: 'Argentina', flag: '🇦🇷', color: '#74ACDF', count: 20 },
-  SAU: { name: 'Arábia Saudita', flag: '🇸🇦', color: '#006C35', count: 20 },
-  MEX: { name: 'México', flag: '🇲🇽', color: '#006847', count: 20 },
-  POL: { name: 'Polônia', flag: '🇵🇱', color: '#DC143C', count: 20 },
-  FRA: { name: 'França', flag: '🇫🇷', color: '#002395', count: 20 },
-  AUS: { name: 'Austrália', flag: '🇦🇺', color: '#00843D', count: 20 },
-  DEN: { name: 'Dinamarca', flag: '🇩🇰', color: '#C60C30', count: 20 },
-  TUN: { name: 'Tunísia', flag: '🇹🇳', color: '#E70013', count: 20 },
-  ESP: { name: 'Espanha', flag: '🇪🇸', color: '#AA151B', count: 20 },
-  CRC: { name: 'Costa Rica', flag: '🇨🇷', color: '#002B7F', count: 20 },
-  GER: { name: 'Alemanha', flag: '🇩🇪', color: '#000000', count: 20 },
-  JPN: { name: 'Japão', flag: '🇯🇵', color: '#BC002D', count: 20 },
-  BEL: { name: 'Bélgica', flag: '🇧🇪', color: '#EF3340', count: 20 },
-  CAN: { name: 'Canadá', flag: '🇨🇦', color: '#FF0000', count: 20 },
-  MAR: { name: 'Marrocos', flag: '🇲🇦', color: '#C1272D', count: 20 },
-  CRO: { name: 'Croácia', flag: '🇭🇷', color: '#FF0000', count: 20 },
-  BRA: { name: 'Brasil', flag: '🇧🇷', color: '#009C3B', count: 20 },
-  SRB: { name: 'Sérvia', flag: '🇷🇸', color: '#C6363C', count: 20 },
-  CHE: { name: 'Suíça', flag: '🇨🇭', color: '#FF0000', count: 20 },
-  CMR: { name: 'Camarões', flag: '🇨🇲', color: '#007A5E', count: 20 },
-  POR: { name: 'Portugal', flag: '🇵🇹', color: '#006600', count: 20 },
-  GHA: { name: 'Gana', flag: '🇬🇭', color: '#006B3F', count: 20 },
-  URU: { name: 'Uruguai', flag: '🇺🇾', color: '#5EB6E4', count: 20 },
-  KOR: { name: 'Coreia do Sul', flag: '🇰🇷', color: '#C60C30', count: 20 },
-};
+  // ---- GRUPO A ----
+  {
+    group: 'Grupo A', groupCode: 'A',
+    color: '#e53935',
+    countries: [
+      { name: 'México',           code: 'MEX', flag: '🇲🇽', stickers: 20 },
+      { name: 'África do Sul',    code: 'RSA', flag: '🇿🇦', stickers: 20 },
+      { name: 'Coreia do Sul',    code: 'KOR', flag: '🇰🇷', stickers: 20 },
+      { name: 'Rep. Checa',       code: 'CZE', flag: '🇨🇿', stickers: 20 },
+    ],
+  },
 
-// Generate all sticker codes: QAT1..QAT20, BRA1..BRA20, etc.
-function generateStickers() {
-  const stickers = [];
-  for (const [group, teams] of Object.entries(GROUPS)) {
-    for (const teamCode of teams) {
-      const team = TEAMS[teamCode];
-      for (let i = 1; i <= team.count; i++) {
-        stickers.push({
-          code: `${teamCode}${i}`,
-          country: teamCode,
-          group,
-          number: i,
-        });
+  // ---- GRUPO B ----
+  {
+    group: 'Grupo B', groupCode: 'B',
+    color: '#1e88e5',
+    countries: [
+      { name: 'Canadá',           code: 'CAN', flag: '🇨🇦', stickers: 20 },
+      { name: 'Bósnia e Herz.',   code: 'BIH', flag: '🇧🇦', stickers: 20 },
+      { name: 'Catar',            code: 'QAT', flag: '🇶🇦', stickers: 20 },
+      { name: 'Suíça',            code: 'SUI', flag: '🇨🇭', stickers: 20 },
+    ],
+  },
+
+  // ---- GRUPO C ----
+  {
+    group: 'Grupo C', groupCode: 'C',
+    color: '#00897b',
+    countries: [
+      { name: 'Brasil',           code: 'BRA', flag: '🇧🇷', stickers: 20 },
+      { name: 'Marrocos',         code: 'MAR', flag: '🇲🇦', stickers: 20 },
+      { name: 'Haiti',            code: 'HAI', flag: '🇭🇹', stickers: 20 },
+      { name: 'Escócia',          code: 'SCO', flag: '🏴󠁧󠁢󠁳󠁣󠁴󠁿', stickers: 20 },
+    ],
+  },
+
+  // ---- GRUPO D ----
+  {
+    group: 'Grupo D', groupCode: 'D',
+    color: '#7b1fa2',
+    countries: [
+      { name: 'Estados Unidos',   code: 'USA', flag: '🇺🇸', stickers: 20 },
+      { name: 'Paraguai',         code: 'PAR', flag: '🇵🇾', stickers: 20 },
+      { name: 'Austrália',        code: 'AUS', flag: '🇦🇺', stickers: 20 },
+      { name: 'Turquia',          code: 'TUR', flag: '🇹🇷', stickers: 20 },
+    ],
+  },
+
+  // ---- GRUPO E ----
+  {
+    group: 'Grupo E', groupCode: 'E',
+    color: '#f57c00',
+    countries: [
+      { name: 'Alemanha',         code: 'GER', flag: '🇩🇪', stickers: 20 },
+      { name: 'Curaçao',          code: 'CUW', flag: '🇨🇼', stickers: 20 },
+      { name: 'Costa do Marfim',  code: 'CIV', flag: '🇨🇮', stickers: 20 },
+      { name: 'Equador',          code: 'ECU', flag: '🇪🇨', stickers: 20 },
+    ],
+  },
+
+  // ---- GRUPO F ----
+  {
+    group: 'Grupo F', groupCode: 'F',
+    color: '#5e35b1',
+    countries: [
+      { name: 'Países Baixos',    code: 'NED', flag: '🇳🇱', stickers: 20 },
+      { name: 'Japão',            code: 'JPN', flag: '🇯🇵', stickers: 20 },
+      { name: 'Suécia',           code: 'SWE', flag: '🇸🇪', stickers: 20 },
+      { name: 'Tunísia',          code: 'TUN', flag: '🇹🇳', stickers: 20 },
+    ],
+  },
+
+  // ---- GRUPO G ----
+  {
+    group: 'Grupo G', groupCode: 'G',
+    color: '#c0392b',
+    countries: [
+      { name: 'Bélgica',          code: 'BEL', flag: '🇧🇪', stickers: 20 },
+      { name: 'Egito',            code: 'EGY', flag: '🇪🇬', stickers: 20 },
+      { name: 'Irã',              code: 'IRN', flag: '🇮🇷', stickers: 20 },
+      { name: 'Nova Zelândia',    code: 'NZL', flag: '🇳🇿', stickers: 20 },
+    ],
+  },
+
+  // ---- GRUPO H ----
+  {
+    group: 'Grupo H', groupCode: 'H',
+    color: '#2e7d32',
+    countries: [
+      { name: 'Espanha',          code: 'ESP', flag: '🇪🇸', stickers: 20 },
+      { name: 'Cabo Verde',       code: 'CPV', flag: '🇨🇻', stickers: 20 },
+      { name: 'Arábia Saudita',   code: 'KSA', flag: '🇸🇦', stickers: 20 },
+      { name: 'Uruguai',          code: 'URU', flag: '🇺🇾', stickers: 20 },
+    ],
+  },
+
+  // ---- GRUPO I ----
+  {
+    group: 'Grupo I', groupCode: 'I',
+    color: '#00838f',
+    countries: [
+      { name: 'França',           code: 'FRA', flag: '🇫🇷', stickers: 20 },
+      { name: 'Senegal',          code: 'SEN', flag: '🇸🇳', stickers: 20 },
+      { name: 'Iraque',           code: 'IRQ', flag: '🇮🇶', stickers: 20 },
+      { name: 'Noruega',          code: 'NOR', flag: '🇳🇴', stickers: 20 },
+    ],
+  },
+
+  // ---- GRUPO J ----
+  {
+    group: 'Grupo J', groupCode: 'J',
+    color: '#558b2f',
+    countries: [
+      { name: 'Argentina',        code: 'ARG', flag: '🇦🇷', stickers: 20 },
+      { name: 'Argélia',          code: 'ALG', flag: '🇩🇿', stickers: 20 },
+      { name: 'Áustria',          code: 'AUT', flag: '🇦🇹', stickers: 20 },
+      { name: 'Jordânia',         code: 'JOR', flag: '🇯🇴', stickers: 20 },
+    ],
+  },
+
+  // ---- GRUPO K ----
+  {
+    group: 'Grupo K', groupCode: 'K',
+    color: '#4527a0',
+    countries: [
+      { name: 'Portugal',         code: 'POR', flag: '🇵🇹', stickers: 20 },
+      { name: 'Congo DR',         code: 'COD', flag: '🇨🇩', stickers: 20 },
+      { name: 'Uzbequistão',      code: 'UZB', flag: '🇺🇿', stickers: 20 },
+      { name: 'Colômbia',         code: 'COL', flag: '🇨🇴', stickers: 20 },
+    ],
+  },
+
+  // ---- GRUPO L ----
+  {
+    group: 'Grupo L', groupCode: 'L',
+    color: '#00695c',
+    countries: [
+      { name: 'Inglaterra',       code: 'ENG', flag: '🏴󠁧󠁢󠁥󠁮󠁧󠁿', stickers: 20 },
+      { name: 'Croácia',          code: 'CRO', flag: '🇭🇷', stickers: 20 },
+      { name: 'Gana',             code: 'GHA', flag: '🇬🇭', stickers: 20 },
+      { name: 'Panamá',           code: 'PAN', flag: '🇵🇦', stickers: 20 },
+    ],
+  },
+];
+
+// --------------------------------------------------------------------------
+// Build STICKER_MAP and ALL_STICKERS (compatibility with CollectionContext)
+// --------------------------------------------------------------------------
+export const STICKER_MAP = {};
+export const ALL_STICKERS = [];
+
+albumStructure.forEach((section) => {
+  if (section.type === 'initial') {
+    section.stickers.forEach((s) => {
+      s.numbers.forEach((n) => {
+        const key = `${s.code}${n}`;
+        const entry = { code: key, country: s.code, countryName: s.name, group: 'INICIAL', number: n, flag: s.flag };
+        STICKER_MAP[key] = entry;
+        ALL_STICKERS.push(entry);
+      });
+    });
+  } else {
+    section.countries.forEach((c) => {
+      for (let i = 1; i <= c.stickers; i++) {
+        const key = `${c.code}${i}`;
+        const entry = { code: key, country: c.code, countryName: c.name, group: section.groupCode, number: i, flag: c.flag };
+        STICKER_MAP[key] = entry;
+        ALL_STICKERS.push(entry);
       }
-    }
+    });
   }
-  // Special stickers: FWC1..FWC20 (official stickers / capa)
-  for (let i = 1; i <= 20; i++) {
-    stickers.push({ code: `FWC${i}`, country: 'FWC', group: 'FWC', number: i });
-  }
-  return stickers;
-}
+});
 
-export const ALL_STICKERS = generateStickers();
-export const STICKER_MAP = Object.fromEntries(ALL_STICKERS.map((s) => [s.code, s]));
 export const TOTAL_STICKERS = ALL_STICKERS.length;
 
-// FWC special team entry
-TEAMS['FWC'] = { name: 'Especiais', flag: '🏆', color: '#C9A84C', count: 20 };
-GROUPS['FWC'] = ['FWC'];
+// --------------------------------------------------------------------------
+// GROUPS / TEAMS — mantidos para compatibilidade com Dashboard e Context
+// --------------------------------------------------------------------------
+export const GROUPS = {};
+export const TEAMS = {};
+
+albumStructure.forEach((section) => {
+  if (section.type === 'initial') return;
+  const { groupCode, countries } = section;
+  GROUPS[groupCode] = countries.map((c) => c.code);
+  countries.forEach((c) => {
+    if (!TEAMS[c.code]) {
+      TEAMS[c.code] = { name: c.name, flag: c.flag, color: section.color || '#009C3B', count: c.stickers };
+    }
+  });
+});
+
+// FWC special entry for compatibility
+TEAMS['FWC'] = { name: 'Especiais', flag: '🏆', color: '#C9A84C', count: 1 };

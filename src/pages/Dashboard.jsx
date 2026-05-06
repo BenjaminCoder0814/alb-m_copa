@@ -159,7 +159,7 @@ export default function Dashboard() {
           <span>⭐</span> Selecoes Favoritas
         </p>
         <div className="flex flex-wrap gap-2">
-          {['BRA', 'ARG', 'FRA', 'GER', 'ENG', 'POR', 'ESP', 'ITA'].filter(code => TEAMS[code]).map((code) => {
+          {['BRA', 'ARG', 'FRA', 'GER', 'ENG', 'POR', 'ESP', 'NED', 'BEL', 'MEX', 'COL', 'URU'].filter(code => TEAMS[code]).map((code) => {
             const t = TEAMS[code];
             return (
               <div key={code} className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl" style={{ background: `${t.color || GREEN}18`, border: `1px solid ${t.color || GREEN}33` }}>
