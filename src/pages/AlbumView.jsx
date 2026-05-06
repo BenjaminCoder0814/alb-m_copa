@@ -148,11 +148,14 @@ function InitialSection({ section, collection, onAdd, onRemove, expanded, onTogg
         style={{ background: 'linear-gradient(135deg, rgba(201,168,76,0.15), rgba(0,0,0,0.3))' }}
       >
         <div className="flex items-center gap-2">
-          <span className="text-lg">🏆</span>
+          <span className="text-lg">{section.bonus ? '🥤' : '🏆'}</span>
           <span className="text-sm font-black text-white">{section.section}</span>
           <span className="text-xs px-2 py-0.5 rounded-full" style={{ background: 'rgba(201,168,76,0.2)', color: '#C9A84C' }}>
             {section.stickers.reduce((a, s) => a + s.numbers.length, 0)} figurinhas
           </span>
+          {section.bonus && (
+            <span className="text-[9px] px-1.5 py-0.5 rounded-full font-bold" style={{ background: 'rgba(244,0,0,0.15)', color: '#ff6b6b' }}>BÔNUS</span>
+          )}
         </div>
         {expanded ? <ChevronDown size={16} className="text-white/50" /> : <ChevronRight size={16} className="text-white/50" />}
       </button>
@@ -384,10 +387,14 @@ export default function AlbumView({ readOnly = false }) {
   const handleRemove = useCallback((code) => removeSticker(code), [removeSticker]);
 
   const totalStickers = albumStructure.reduce((sum, s) => {
+    if (s.bonus) return sum; // bonus n\u00e3o conta no total oficial
     if (s.type === 'initial') return sum + s.stickers.reduce((a, x) => a + x.numbers.length, 0);
     return sum + s.countries.reduce((a, c) => a + c.stickers, 0);
   }, 0);
-  const ownedCount = Object.keys(collection).length;
+  const ownedCount = Object.keys(collection).filter(code => {
+    // exclui b\u00f4nus (COC) da contagem oficial
+    return !code.startsWith('COC');
+  }).length;
   const pctComplete = totalStickers ? ((ownedCount / totalStickers) * 100).toFixed(1) : '0.0';
 
   return (

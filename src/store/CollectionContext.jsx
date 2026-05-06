@@ -2,7 +2,7 @@ import { createContext, useContext, useState, useCallback, useEffect, useRef } f
 import { signInAnonymously, onAuthStateChanged } from 'firebase/auth';
 import { ref, set, get } from 'firebase/database';
 import { auth, db } from '../firebase';
-import { STICKER_MAP, ALL_STICKERS, GROUPS, TEAMS } from '../data/stickers';
+import { STICKER_MAP, ALL_STICKERS, OFFICIAL_STICKERS, GROUPS, TEAMS } from '../data/stickers';
 
 const STORAGE_KEY = 'copa_collection';
 
@@ -174,7 +174,7 @@ export function CollectionProvider({ children }) {
   }, []);
 
   const getMissingStickers = useCallback(() => {
-    return ALL_STICKERS.filter((s) => !collection[s.code]);
+    return OFFICIAL_STICKERS.filter((s) => !collection[s.code]);
   }, [collection]);
 
   const getDuplicateStickers = useCallback(() => {
@@ -185,7 +185,8 @@ export function CollectionProvider({ children }) {
   }, [collection]);
 
   const getOwnedCount = useCallback(() => {
-    return Object.keys(collection).length;
+    // Só conta as oficiais (sem bônus Copa Coca-Cola)
+    return OFFICIAL_STICKERS.filter(s => collection[s.code]).length;
   }, [collection]);
 
   const getTotalDuplicates = useCallback(() => {
@@ -194,7 +195,7 @@ export function CollectionProvider({ children }) {
 
   const calculateProgress = useCallback(() => {
     const owned = getOwnedCount();
-    const total = ALL_STICKERS.length;
+    const total = OFFICIAL_STICKERS.length;
     const percentage = total ? ((owned / total) * 100).toFixed(1) : '0.0';
     return { owned, total, percentage };
   }, [getOwnedCount]);

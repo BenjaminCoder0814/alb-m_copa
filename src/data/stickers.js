@@ -167,10 +167,11 @@ export const albumStructure = [
     ],
   },
 
-  // ---- COPA COCA-COLA (final do álbum) — COC1 a COC14 ----
+  // ---- COPA COCA-COLA (final do álbum, BONUS — não conta no total oficial 980) ----
   {
     section: 'Copa Coca-Cola',
     type: 'initial',
+    bonus: true,
     stickers: [
       { code: 'COC', name: 'Copa Coca-Cola', flag: '🥤', numbers: [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14] },
     ],
@@ -188,7 +189,7 @@ albumStructure.forEach((section) => {
     section.stickers.forEach((s) => {
       s.numbers.forEach((n) => {
         const key = `${s.code}${n}`;
-        const entry = { code: key, country: s.code, countryName: s.name, group: 'INICIAL', number: n, flag: s.flag };
+        const entry = { code: key, country: s.code, countryName: s.name, group: 'INICIAL', number: n, flag: s.flag, bonus: !!section.bonus };
         STICKER_MAP[key] = entry;
         // displayOnly = figurinha compartilhada com grupo (ex: MEX1–3). Não duplica em ALL_STICKERS.
         if (!s.displayOnly) {
@@ -200,7 +201,7 @@ albumStructure.forEach((section) => {
     section.countries.forEach((c) => {
       for (let i = 1; i <= c.stickers; i++) {
         const key = `${c.code}${i}`;
-        const entry = { code: key, country: c.code, countryName: c.name, group: section.groupCode, number: i, flag: c.flag };
+        const entry = { code: key, country: c.code, countryName: c.name, group: section.groupCode, number: i, flag: c.flag, bonus: false };
         STICKER_MAP[key] = entry;
         ALL_STICKERS.push(entry);
       }
@@ -209,6 +210,8 @@ albumStructure.forEach((section) => {
 });
 
 export const TOTAL_STICKERS = ALL_STICKERS.length;
+export const OFFICIAL_STICKERS = ALL_STICKERS.filter(s => !s.bonus);
+export const TOTAL_OFFICIAL = OFFICIAL_STICKERS.length;
 
 // --------------------------------------------------------------------------
 // GROUPS / TEAMS — mantidos para compatibilidade com Dashboard e Context
