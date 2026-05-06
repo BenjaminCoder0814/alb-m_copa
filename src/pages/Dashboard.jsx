@@ -1,168 +1,174 @@
-import { motion } from 'framer-motion';
+﻿import { motion } from 'framer-motion';
 import { useCollection } from '../store/CollectionContext';
-import { ALL_STICKERS, GROUPS, TEAMS } from '../data/stickers';
-import { TrendingUp, Star, Copy, AlertCircle, Trophy } from 'lucide-react';
+import { GROUPS, TEAMS } from '../data/stickers';
+import { Trophy, Star, Copy, BookOpen } from 'lucide-react';
 
-function StatCard({ icon: Icon, label, value, gradient, delay }) {
+const GREEN = '#009C3B';
+const YELLOW = '#FFDF00';
+const BLUE = '#002776';
+
+function StatCard({ icon, label, value, color, delay }) {
   return (
     <motion.div
-      initial={{ opacity: 0, y: 24, scale: 0.95 }}
-      animate={{ opacity: 1, y: 0, scale: 1 }}
-      transition={{ delay, type: 'spring', stiffness: 200, damping: 20 }}
-      className="relative overflow-hidden rounded-2xl p-4"
-      style={{ background: 'rgba(255,255,255,0.06)', border: '1px solid rgba(255,255,255,0.1)', backdropFilter: 'blur(12px)' }}
+      initial={{ opacity: 0, y: 20 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ delay }}
+      className="rounded-2xl p-4 flex items-center gap-3"
+      style={{ background: `linear-gradient(135deg, ${color}15, rgba(0,0,0,0.3))`, border: `1px solid ${color}30` }}
     >
-      <div className={`absolute -top-4 -right-4 w-20 h-20 rounded-full opacity-20 blur-2xl ${gradient}`} />
-      <div className={`w-10 h-10 rounded-xl flex items-center justify-center mb-3 ${gradient}`}>
-        <Icon size={18} className="text-white" />
+      <div className="w-10 h-10 rounded-xl flex items-center justify-center shrink-0" style={{ background: `${color}20`, border: `1px solid ${color}40` }}>
+        {icon}
       </div>
-      <p className="text-3xl font-black text-white tracking-tight">{value}</p>
-      <p className="text-xs text-white/50 font-medium mt-0.5 uppercase tracking-widest">{label}</p>
+      <div>
+        <p className="text-2xl font-black text-white">{value}</p>
+        <p className="text-xs" style={{ color: 'rgba(255,255,255,0.35)' }}>{label}</p>
+      </div>
     </motion.div>
   );
 }
 
 function CircleProgress({ pct }) {
-  const r = 52;
+  const r = 46;
   const circ = 2 * Math.PI * r;
-  const offset = circ - (pct / 100) * circ;
+  const dash = (pct / 100) * circ;
   return (
-    <div className="relative w-40 h-40 mx-auto">
-      <svg className="w-full h-full -rotate-90" viewBox="0 0 120 120">
-        <circle cx="60" cy="60" r={r} fill="none" stroke="rgba(255,255,255,0.08)" strokeWidth="10" />
-        <motion.circle
-          cx="60" cy="60" r={r}
-          fill="none" stroke="url(#goldGrad)" strokeWidth="10"
+    <div className="relative flex items-center justify-center">
+      <svg width="120" height="120" className="-rotate-90">
+        <circle cx="60" cy="60" r={r} fill="none" strokeWidth="8" stroke="rgba(255,255,255,0.08)" />
+        <circle
+          cx="60" cy="60" r={r} fill="none" strokeWidth="8"
+          stroke="url(#circleGrad)"
+          strokeDasharray={`${dash} ${circ}`}
           strokeLinecap="round"
-          strokeDasharray={circ}
-          initial={{ strokeDashoffset: circ }}
-          animate={{ strokeDashoffset: offset }}
-          transition={{ duration: 2, ease: 'easeOut' }}
         />
         <defs>
-          <linearGradient id="goldGrad" x1="0%" y1="0%" x2="100%" y2="100%">
-            <stop offset="0%" stopColor="#FFD700" />
-            <stop offset="50%" stopColor="#C9A84C" />
-            <stop offset="100%" stopColor="#FF8C00" />
+          <linearGradient id="circleGrad" x1="0" y1="0" x2="1" y2="0">
+            <stop offset="0%" stopColor={BLUE} />
+            <stop offset="50%" stopColor={GREEN} />
+            <stop offset="100%" stopColor={YELLOW} />
           </linearGradient>
         </defs>
       </svg>
-      <div className="absolute inset-0 flex flex-col items-center justify-center">
-        <motion.span
-          initial={{ opacity: 0, scale: 0.5 }}
-          animate={{ opacity: 1, scale: 1 }}
-          transition={{ delay: 0.5, type: 'spring' }}
-          className="text-4xl font-black text-white leading-none"
-        >
-          {pct}%
-        </motion.span>
-        <span className="text-xs text-white/50 mt-1 uppercase tracking-widest">completo</span>
+      <div className="absolute text-center">
+        <p className="text-2xl font-black text-white">{pct}%</p>
+        <p className="text-[9px]" style={{ color: 'rgba(255,255,255,0.35)' }}>completo</p>
       </div>
     </div>
   );
 }
 
-function GroupBar({ group, data, index }) {
+function GroupBar({ group, teams }) {
+  const { getGroupProgress } = useCollection();
+  const allGroups = getGroupProgress();
+  const { owned, total, pct } = allGroups[group] || { owned: 0, total: 0, pct: 0 };
   return (
-    <motion.div
-      initial={{ opacity: 0, x: -20 }}
-      animate={{ opacity: 1, x: 0 }}
-      transition={{ delay: 0.05 * index }}
-      className="flex items-center gap-3 py-1.5"
-    >
-      <div className="w-7 h-7 rounded-lg flex items-center justify-center shrink-0" style={{ background: 'linear-gradient(135deg, #3b82f6, #1d4ed8)' }}>
-        <span className="text-[11px] font-black text-white">{group}</span>
+    <div>
+      <div className="flex items-center justify-between mb-1">
+        <div className="flex items-center gap-1.5">
+          <div className="w-6 h-6 rounded-lg flex items-center justify-center text-[10px] font-black" style={{ background: `linear-gradient(135deg, #005c27, ${GREEN})`, color: YELLOW }}>
+            {group}
+          </div>
+          <span className="text-xs font-bold text-white/60">Grupo {group}</span>
+        </div>
+        <span className="text-xs font-bold" style={{ color: GREEN }}>{owned}/{total}</span>
       </div>
-      <div className="flex-1 h-2 rounded-full overflow-hidden" style={{ background: 'rgba(255,255,255,0.08)' }}>
+      <div className="h-2 rounded-full overflow-hidden" style={{ background: 'rgba(255,255,255,0.07)' }}>
         <motion.div
-          className="h-full rounded-full"
-          style={{ background: 'linear-gradient(90deg, #3b82f6, #1d4ed8)' }}
           initial={{ width: 0 }}
-          animate={{ width: `${data.pct}%` }}
-          transition={{ duration: 1, ease: 'easeOut', delay: 0.05 * index }}
+          animate={{ width: `${pct}%` }}
+          transition={{ duration: 0.8, ease: 'easeOut' }}
+          className="h-full rounded-full"
+          style={{ background: `linear-gradient(90deg, ${GREEN}88, ${GREEN})` }}
         />
       </div>
-      <span className="text-xs text-white/40 w-14 text-right font-mono">{data.owned}/{data.total}</span>
-    </motion.div>
+    </div>
   );
 }
 
 export default function Dashboard() {
-  const { getOwnedCount, getTotalDuplicates, calculateProgress, getGroupProgress } = useCollection();
-
-  const owned = getOwnedCount();
-  const duplicates = getTotalDuplicates();
-  const missing = ALL_STICKERS.length - owned;
-  const pct = calculateProgress();
-  const groupProgress = getGroupProgress();
+  const { calculateProgress, getDuplicateStickers, getMissingStickers, getTotalDuplicates } = useCollection();
+  const { owned, total, percentage: pct } = calculateProgress();
+  const dupes = getDuplicateStickers().length;
+  const missing = getMissingStickers().length;
+  const extraCopies = getTotalDuplicates();
 
   return (
-    <div className="space-y-5 pb-6">
-      {/* Hero Banner */}
+    <div className="pb-6 space-y-5">
+      {/* Hero */}
       <motion.div
-        initial={{ opacity: 0, y: -20 }}
+        initial={{ opacity: 0, y: -16 }}
         animate={{ opacity: 1, y: 0 }}
         className="relative overflow-hidden rounded-3xl p-6 text-white"
         style={{
-          background: 'linear-gradient(135deg, #0d1b4b 0%, #1a3a8f 40%, #0d1b4b 100%)',
-          border: '1px solid rgba(255,215,0,0.2)',
-          boxShadow: '0 0 60px rgba(29,78,216,0.4), inset 0 1px 0 rgba(255,255,255,0.1)',
+          background: 'linear-gradient(135deg, #003d1a 0%, #005c27 50%, #004d20 100%)',
+          border: `1px solid ${GREEN}55`,
+          boxShadow: `0 0 50px ${GREEN}33`,
         }}
       >
-        {/* Decorative circles */}
-        <div className="absolute -top-16 -right-16 w-48 h-48 rounded-full opacity-10" style={{ background: 'radial-gradient(circle, #FFD700, transparent)' }} />
-        <div className="absolute -bottom-8 -left-8 w-32 h-32 rounded-full opacity-10" style={{ background: 'radial-gradient(circle, #3b82f6, transparent)' }} />
+        <div className="absolute top-0 left-0 right-0 h-1.5 rounded-t-3xl" style={{ background: `linear-gradient(90deg, ${BLUE}, ${GREEN}, ${YELLOW}, ${GREEN}, ${BLUE})` }} />
+        <div className="absolute -bottom-10 -right-10 w-40 h-40 rounded-full opacity-10 blur-3xl" style={{ background: YELLOW }} />
+        <div className="absolute -top-6 -left-6 w-24 h-24 rounded-full opacity-10 blur-2xl" style={{ background: BLUE }} />
 
-        {/* Gold top bar */}
-        <div className="absolute top-0 left-0 right-0 h-0.5" style={{ background: 'linear-gradient(90deg, transparent, #FFD700, transparent)' }} />
-
-        <div className="flex items-start justify-between mb-6">
-          <div>
-            <p className="text-xs uppercase tracking-widest font-semibold mb-1" style={{ color: '#FFD700' }}>
-              ⚽ FIFA World Cup 2026
-            </p>
-            <h1 className="text-3xl font-black tracking-tight leading-none">Meu<br />Álbum</h1>
+        <div className="flex items-center justify-between">
+          <div className="flex-1">
+            <div className="flex items-center gap-2 mb-1">
+              <span className="text-2xl">🇧🇷</span>
+              <span className="text-xs font-black uppercase tracking-widest" style={{ color: YELLOW }}>Copa do Mundo 2026</span>
+            </div>
+            <h1 className="text-3xl font-black leading-tight">Meu Album</h1>
+            <p className="text-white/50 text-sm mt-0.5">{owned} de {total} figurinhas</p>
           </div>
-          <motion.div
-            animate={{ rotate: [0, 10, -10, 0] }}
-            transition={{ repeat: Infinity, duration: 4, ease: 'easeInOut' }}
-          >
-            <Trophy size={48} className="opacity-80" style={{ color: '#FFD700' }} />
-          </motion.div>
-        </div>
-
-        <CircleProgress pct={pct} />
-
-        <div className="mt-4 text-center">
-          <span className="text-white/60 text-sm">
-            <span className="text-white font-bold">{owned}</span> de <span className="text-white font-bold">{ALL_STICKERS.length}</span> figurinhas coletadas
-          </span>
+          <CircleProgress pct={pct} />
         </div>
       </motion.div>
 
-      {/* Stats grid */}
+      {/* Stats */}
       <div className="grid grid-cols-2 gap-3">
-        <StatCard icon={Star} label="Coletadas" value={owned} gradient="bg-blue-600" delay={0.1} />
-        <StatCard icon={Copy} label="Repetidas" value={duplicates} gradient="bg-amber-500" delay={0.15} />
-        <StatCard icon={AlertCircle} label="Faltando" value={missing} gradient="bg-rose-500" delay={0.2} />
-        <StatCard icon={TrendingUp} label="Progresso" value={`${pct}%`} gradient="bg-emerald-500" delay={0.25} />
+        <StatCard icon={<Trophy size={18} color={YELLOW} />} label="Figurinhas" value={owned} color={GREEN} delay={0.1} />
+        <StatCard icon={<BookOpen size={18} color={GREEN} />} label="Faltam" value={missing} color="#2563eb" delay={0.15} />
+        <StatCard icon={<Copy size={18} color={YELLOW} />} label="Tipos repet." value={dupes} color={YELLOW} delay={0.2} />
+        <StatCard icon={<Star size={18} color="#f97316" />} label="Copias extras" value={extraCopies} color="#f97316" delay={0.25} />
       </div>
 
-      {/* Group progress */}
+      {/* Progress por grupo */}
       <motion.div
-        initial={{ opacity: 0, y: 20 }}
+        initial={{ opacity: 0, y: 12 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ delay: 0.3 }}
-        className="rounded-2xl p-5"
-        style={{ background: 'rgba(255,255,255,0.05)', border: '1px solid rgba(255,255,255,0.08)' }}
+        className="rounded-3xl p-5 space-y-3.5"
+        style={{ background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.07)' }}
       >
-        <div className="flex items-center gap-2 mb-4">
-          <div className="w-1 h-5 rounded-full" style={{ background: 'linear-gradient(180deg, #FFD700, #C9A84C)' }} />
-          <h2 className="text-sm font-bold text-white/70 uppercase tracking-widest">Progresso por Grupo</h2>
-        </div>
-        {Object.entries(groupProgress).map(([group, data], i) => (
-          <GroupBar key={group} group={group} data={data} index={i} />
+        <p className="font-black text-white text-sm flex items-center gap-2">
+          <span className="w-6 h-6 rounded-lg flex items-center justify-center" style={{ background: `${GREEN}25`, border: `1px solid ${GREEN}55` }}>📊</span>
+          Progresso por Grupo
+        </p>
+        {Object.entries(GROUPS).map(([g, teams]) => (
+          <GroupBar key={g} group={g} teams={teams} />
         ))}
+      </motion.div>
+
+      {/* Paises do Brasil pra animar */}
+      <motion.div
+        initial={{ opacity: 0, y: 12 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ delay: 0.4 }}
+        className="rounded-3xl p-5"
+        style={{ background: 'rgba(255,255,255,0.03)', border: '1px solid rgba(255,255,255,0.06)' }}
+      >
+        <p className="font-black text-white text-sm mb-3 flex items-center gap-2">
+          <span>⭐</span> Selecoes Favoritas
+        </p>
+        <div className="flex flex-wrap gap-2">
+          {['BRA', 'ARG', 'FRA', 'GER', 'ENG', 'POR', 'ESP', 'ITA'].filter(code => TEAMS[code]).map((code) => {
+            const t = TEAMS[code];
+            return (
+              <div key={code} className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl" style={{ background: `${t.color || GREEN}18`, border: `1px solid ${t.color || GREEN}33` }}>
+                <span className="text-sm">{t.flag}</span>
+                <span className="text-xs font-bold text-white/60">{t.name}</span>
+              </div>
+            );
+          })}
+        </div>
       </motion.div>
     </div>
   );

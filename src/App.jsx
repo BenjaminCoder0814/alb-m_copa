@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { AnimatePresence, motion } from 'framer-motion';
 import { CollectionProvider } from './store/CollectionContext';
+import TributeModal from './components/TributeModal';
 import BottomNav from './components/BottomNav';
 import Dashboard from './pages/Dashboard';
 import StickerInput from './pages/StickerInput';
@@ -34,11 +35,12 @@ function PageWrapper({ children }) {
 
 function App() {
   const [tab, setTab] = useState('dashboard');
+  const [showTribute, setShowTribute] = useState(true);
   const Page = PAGES[tab];
 
   return (
     <CollectionProvider>
-      <div className="min-h-screen" style={{ background: '#0a0f1e' }}>
+      <div className="min-h-screen" style={{ background: '#011a07' }}>
         <main className="max-w-lg mx-auto pb-24">
           <AnimatePresence mode="wait">
             <PageWrapper key={tab}>
@@ -46,7 +48,8 @@ function App() {
             </PageWrapper>
           </AnimatePresence>
         </main>
-        <BottomNav active={tab} onSelect={setTab} />
+        <TributeModal open={showTribute} onClose={() => setShowTribute(false)} />
+        <BottomNav active={tab} onNavigate={setTab} />
       </div>
     </CollectionProvider>
   );

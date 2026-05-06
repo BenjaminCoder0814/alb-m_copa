@@ -88,6 +88,38 @@ export function CollectionProvider({ children }) {
     });
   }, []);
 
+  // Trade: give one duplicate away, receive a new sticker
+  // Returns { success, message }
+  const tradeSticker = useCallback((giveCode, receiveCode) => {
+    giveCode = giveCode.trim().toUpperCase();
+    receiveCode = receiveCode.trim().toUpperCase();
+
+    if (!STICKER_MAP[giveCode]) return { success: false, message: `Figurinha "${giveCode}" não existe no álbum.` };
+    if (!STICKER_MAP[receiveCode]) return { success: false, message: `Figurinha "${receiveCode}" não existe no álbum.` };
+
+    let message = '';
+    setCollection((prev) => {
+      const next = { ...prev };
+      // Remove one copy of the given sticker
+      if (!next[giveCode] || next[giveCode] <= 1) {
+        message = `Você não tem cópias extras de ${giveCode} para dar.`;
+        return prev;
+      }
+      next[giveCode] -= 1;
+      // Add the received sticker
+      if (!next[receiveCode]) {
+        next[receiveCode] = 1;
+        message = `Troca feita! Deu ${giveCode}, recebeu ${receiveCode} (nova!).`;
+      } else {
+        next[receiveCode] += 1;
+        message = `Troca feita! Deu ${giveCode}, recebeu ${receiveCode} (repetida x${next[receiveCode]}).`;
+      }
+      return next;
+    });
+
+    return { success: true, message };
+  }, []);
+
   const getMissingStickers = useCallback(() => {
     return ALL_STICKERS.filter((s) => !collection[s.code]);
   }, [collection]);
@@ -173,6 +205,7 @@ export function CollectionProvider({ children }) {
       removeSticker,
       removeStickerCompletely,
       markTraded,
+      tradeSticker,
       getMissingStickers,
       getDuplicateStickers,
       getOwnedCount,
