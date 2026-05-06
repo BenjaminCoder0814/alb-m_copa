@@ -1,4 +1,4 @@
-import { useEffect, useRef } from 'react';
+import { useState, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import tributeImg from '../imagens/images.jpg';
 import tributeAudio from '../imagens/Paródia Espera eu chegar.mp4';
@@ -9,19 +9,25 @@ const BLUE = '#002776';
 
 export default function TributeModal({ open, onClose }) {
   const audioRef = useRef(null);
+  const [playing, setPlaying] = useState(false);
 
-  useEffect(() => {
-    if (open && audioRef.current) {
-      audioRef.current.currentTime = 0;
-      audioRef.current.play().catch(() => {});
+  const handlePlay = () => {
+    if (!audioRef.current) return;
+    if (playing) {
+      audioRef.current.pause();
+      setPlaying(false);
+    } else {
+      audioRef.current.currentTime = audioRef.current.currentTime || 0;
+      audioRef.current.play().then(() => setPlaying(true)).catch(() => {});
     }
-  }, [open]);
+  };
 
   const handleClose = () => {
     if (audioRef.current) {
       audioRef.current.pause();
       audioRef.current.currentTime = 0;
     }
+    setPlaying(false);
     onClose();
   };
 
@@ -112,22 +118,44 @@ export default function TributeModal({ open, onClose }) {
                   "Sempre no coração da torcida" 🇧🇷
                 </p>
 
-                {/* Ondas de música */}
-                <div className="flex items-center justify-center gap-1 py-1">
-                  {[12, 20, 14, 24, 10, 18, 22, 10, 16, 20].map((h, i) => (
-                    <motion.div
-                      key={i}
-                      animate={{ height: [h * 0.5, h, h * 0.5] }}
-                      transition={{ duration: 0.8 + i * 0.07, repeat: Infinity, ease: 'easeInOut', delay: i * 0.1 }}
-                      style={{
-                        width: 3,
-                        borderRadius: 4,
-                        background: `linear-gradient(to top, ${GREEN}, ${YELLOW})`,
-                      }}
-                    />
-                  ))}
-                  <span className="ml-2 text-[10px] font-bold" style={{ color: `${YELLOW}88` }}>♪ tocando</span>
-                </div>
+                {/* Botão play / pause */}
+                <motion.button
+                  whileTap={{ scale: 0.93 }}
+                  onClick={handlePlay}
+                  className="mx-auto flex items-center justify-center gap-2.5 px-6 py-3 rounded-2xl font-black text-sm"
+                  style={{
+                    background: playing
+                      ? `rgba(255,223,0,0.15)`
+                      : `linear-gradient(135deg, #004d20, ${GREEN})`,
+                    border: `2px solid ${playing ? YELLOW + '88' : GREEN + '88'}`,
+                    color: playing ? YELLOW : 'white',
+                    boxShadow: playing
+                      ? `0 0 20px ${YELLOW}44`
+                      : `0 4px 20px ${GREEN}55`,
+                  }}
+                >
+                  {playing ? '⏸' : '▶'}&nbsp;
+                  {playing ? 'Pausar música' : '🎵 Tocar música'}
+                </motion.button>
+
+                {/* Ondas animadas só quando tocando */}
+                {playing && (
+                  <div className="flex items-center justify-center gap-1 py-1">
+                    {[12, 20, 14, 24, 10, 18, 22, 10, 16, 20].map((h, i) => (
+                      <motion.div
+                        key={i}
+                        animate={{ height: [h * 0.5, h, h * 0.5] }}
+                        transition={{ duration: 0.8 + i * 0.07, repeat: Infinity, ease: 'easeInOut', delay: i * 0.1 }}
+                        style={{
+                          width: 3,
+                          borderRadius: 4,
+                          background: `linear-gradient(to top, ${GREEN}, ${YELLOW})`,
+                        }}
+                      />
+                    ))}
+                    <span className="ml-2 text-[10px] font-bold" style={{ color: `${YELLOW}88` }}>♪ tocando</span>
+                  </div>
+                )}
               </div>
 
               {/* Botão fechar */}
