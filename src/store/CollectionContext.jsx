@@ -67,6 +67,26 @@ export function CollectionProvider({ children }) {
     return false;
   }, []);
 
+  // Recuperar de QUALQUER UID antigo (para migração entre dispositivos)
+  const recoverFromUID = useCallback(async (oldUid) => {
+    try {
+      const snapshot = await get(ref(db, `colecoes/${oldUid.trim()}`));
+      const data = snapshot.val();
+      if (data && Object.keys(data).length > 0) {
+        setCollectionRaw(data);
+        saveCollection(data);
+        // Salva também no UID atual
+        if (uidRef.current) {
+          set(ref(db, `colecoes/${uidRef.current}`), data);
+        }
+        return Object.keys(data).length;
+      }
+    } catch (e) {
+      console.error('Erro recuperar UID:', e);
+    }
+    return false;
+  }, []);
+
   // Wrapper: salva no localStorage E no Firebase a cada alteração
   const setCollection = useCallback((updater) => {
     setCollectionRaw((prev) => {
@@ -273,6 +293,7 @@ export function CollectionProvider({ children }) {
       importCollection,
       resetCollection,
       recoverFromFirebase,
+      recoverFromUID,
     }}>
       {children}
     </CollectionContext.Provider>

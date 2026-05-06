@@ -87,13 +87,14 @@ function GroupBar({ group, teams }) {
 }
 
 export default function Dashboard() {
-  const { calculateProgress, getDuplicateStickers, getMissingStickers, getTotalDuplicates, recoverFromFirebase, exportCollection } = useCollection();
+  const { calculateProgress, getDuplicateStickers, getMissingStickers, getTotalDuplicates, recoverFromFirebase, recoverFromUID, importCollection, exportCollection } = useCollection();
   const { owned, total, percentage: pct } = calculateProgress();
   const dupes = getDuplicateStickers().length;
   const missing = getMissingStickers().length;
   const extraCopies = getTotalDuplicates();
   const [recovering, setRecovering] = useState(false);
   const [recoverMsg, setRecoverMsg] = useState(null);
+  const [oldUid, setOldUid] = useState('');
 
   return (
     <div className="pb-6 space-y-5">
@@ -136,25 +137,69 @@ export default function Dashboard() {
       {/* Banner de recuperação — aparece só quando coleção está vazia */}
       {owned === 0 && (
         <motion.div initial={{ opacity: 0, y: -8 }} animate={{ opacity: 1, y: 0 }}
-          className="rounded-2xl p-4 space-y-2"
+          className="rounded-2xl p-4 space-y-3"
           style={{ background: 'rgba(255,223,0,0.08)', border: '1px solid rgba(255,223,0,0.3)' }}>
-          <p className="text-xs font-bold" style={{ color: '#FFDF00' }}>⚠️ Coleção parece vazia</p>
-          <p className="text-[11px] text-white/50">Se você tinha figurinhas e sumiram, tente recuperar do backup na nuvem:</p>
-          <div className="flex gap-2">
+          <p className="text-xs font-bold" style={{ color: '#FFDF00' }}>⚠️ Coleção vazia — recuperar backup?</p>
+
+          {/* Recuperar do UID atual */}
+          <button
+            onClick={async () => {
+              setRecovering(true);
+              const count = await recoverFromFirebase();
+              setRecovering(false);
+              setRecoverMsg(count ? `✅ ${count} figurinhas recuperadas!` : '❌ Nada no UID atual.');
+              setTimeout(() => setRecoverMsg(null), 4000);
+            }}
+            disabled={recovering}
+            className="w-full py-2 rounded-xl text-xs font-black"
+            style={{ background: 'rgba(255,223,0,0.2)', color: '#FFDF00', border: '1px solid rgba(255,223,0,0.4)' }}>
+            {recovering ? 'Buscando...' : '☁️ Recuperar do Firebase (UID atual)'}
+          </button>
+
+          {/* Recuperar de UID antigo */}
+          <div className="space-y-2 pt-1 border-t border-white/10">
+            <p className="text-[11px] text-white/50">Ou cole o UID antigo do Firebase:</p>
+            <input
+              value={oldUid}
+              onChange={(e) => setOldUid(e.target.value)}
+              placeholder="Ex: NE9RqaFYPFfkZ0P484AkMo0tmfv1"
+              className="w-full px-3 py-2 rounded-lg text-xs font-mono outline-none"
+              style={{ background: 'rgba(0,0,0,0.3)', border: '1px solid rgba(255,255,255,0.1)', color: 'white' }}
+            />
             <button
               onClick={async () => {
+                if (!oldUid.trim()) return;
                 setRecovering(true);
-                const count = await recoverFromFirebase();
+                const count = await recoverFromUID(oldUid);
                 setRecovering(false);
-                setRecoverMsg(count ? `✅ ${count} figurinhas recuperadas!` : '❌ Nenhum backup encontrado.');
+                setRecoverMsg(count ? `✅ ${count} figurinhas recuperadas do UID antigo!` : '❌ UID inválido ou vazio.');
                 setTimeout(() => setRecoverMsg(null), 4000);
               }}
-              disabled={recovering}
-              className="flex-1 py-2 rounded-xl text-xs font-black"
-              style={{ background: 'rgba(255,223,0,0.2)', color: '#FFDF00', border: '1px solid rgba(255,223,0,0.4)' }}>
-              {recovering ? 'Buscando...' : '☁️ Recuperar do Firebase'}
+              disabled={recovering || !oldUid.trim()}
+              className="w-full py-2 rounded-xl text-xs font-black"
+              style={{ background: oldUid.trim() ? '#009C3B' : 'rgba(255,255,255,0.05)', color: oldUid.trim() ? 'white' : 'rgba(255,255,255,0.3)' }}>
+              {recovering ? 'Buscando...' : '🔑 Recuperar deste UID'}
             </button>
           </div>
+
+          {/* Importar arquivo JSON */}
+          <div className="space-y-2 pt-1 border-t border-white/10">
+            <p className="text-[11px] text-white/50">Ou importe um arquivo JSON:</p>
+            <label className="block w-full py-2 rounded-xl text-xs font-black text-center cursor-pointer"
+              style={{ background: 'rgba(0,39,118,0.4)', color: 'white', border: '1px solid rgba(255,255,255,0.15)' }}>
+              📁 Escolher arquivo JSON
+              <input type="file" accept=".json,application/json" className="hidden"
+                onChange={(e) => {
+                  const f = e.target.files?.[0];
+                  if (f) {
+                    importCollection(f);
+                    setRecoverMsg('✅ Importando...');
+                    setTimeout(() => setRecoverMsg(null), 3000);
+                  }
+                }} />
+            </label>
+          </div>
+
           {recoverMsg && <p className="text-xs font-bold text-center" style={{ color: recoverMsg.startsWith('✅') ? '#009C3B' : '#ef4444' }}>{recoverMsg}</p>}
         </motion.div>
       )}
