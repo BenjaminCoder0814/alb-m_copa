@@ -9,8 +9,8 @@ export const albumStructure = [
     section: 'Página Inicial',
     type: 'initial',
     stickers: [
-      // ---- FWC (FIFA World Cup History) — 10 figurinhas únicas ----
-      { code: 'FWC', name: 'FIFA World Cup History', flag: '🏆', numbers: ['00', 1, 2, 3, 4, 5, 6, 7, 8, 9] },
+      // ---- FWC (FIFA World Cup History) — 9 figurinhas da Página Inicial (FWC00–FWC8) ----
+      { code: 'FWC', name: 'FIFA World Cup History', flag: '🏆', numbers: ['00', 1, 2, 3, 4, 5, 6, 7, 8] },
       // ---- Figuras Históricas — 3 fig. cada (displayOnly: compartilham códigos com os grupos) ----
       { code: 'MEX', name: 'México (Histórico)',    flag: '🇲🇽', numbers: [1, 2, 3], displayOnly: true },
       { code: 'KOR', name: 'Coreia do Sul (Hist.)', flag: '🇰🇷', numbers: [1, 2, 3], displayOnly: true },
@@ -168,6 +168,15 @@ export const albumStructure = [
       { name: 'Panamá',           code: 'PAN', flag: '🇵🇦', stickers: 20 },
     ],
   },
+
+  // ---- FWC HISTÓRICAS (final do álbum) — FWC9 a FWC19 ----
+  {
+    section: 'FWC Históricas',
+    type: 'initial',
+    stickers: [
+      { code: 'FWC', name: 'FIFA World Cup History', flag: '🏆', numbers: [9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19] },
+    ],
+  },
 ];
 
 // --------------------------------------------------------------------------
@@ -221,5 +230,6 @@ albumStructure.forEach((section) => {
 });
 
 // FWC e COC special entries for compatibility
-TEAMS['FWC'] = { name: 'FWC History', flag: '🏆', color: '#C9A84C', count: 10 };
+// FWC total: 9 (pág. inicial) + 11 (históricas final) = 20
+TEAMS['FWC'] = { name: 'FWC History', flag: '🏆', color: '#C9A84C', count: 20 };
 TEAMS['COC'] = { name: 'Copa Coca-Cola', flag: '🥤', color: '#F40000', count: 14 };

@@ -348,7 +348,7 @@ function Legend() {
 // ─── AlbumView (main) ─────────────────────────────────────────────────────────
 export default function AlbumView() {
   const { collection, addStickers, removeSticker } = useCollection();
-  const [expanded, setExpanded] = useState({ initial: true });
+  const [expanded, setExpanded] = useState({ 'Página Inicial': true });
 
   const toggle = useCallback((key) => {
     setExpanded((prev) => ({ ...prev, [key]: !prev[key] }));
@@ -413,9 +413,8 @@ export default function AlbumView() {
           onClick={() => {
             const all = {};
             albumStructure.forEach((s) => {
-              all[s.groupCode || 'initial'] = true;
+              all[s.groupCode || s.section] = true;
             });
-            all['initial'] = true;
             setExpanded(all);
           }}
           className="flex-1 text-xs font-bold py-2 rounded-xl"
@@ -435,15 +434,16 @@ export default function AlbumView() {
       {/* ── Sections ── */}
       {albumStructure.map((section) => {
         if (section.type === 'initial') {
+          const sKey = section.section;
           return (
             <InitialSection
-              key="initial"
+              key={sKey}
               section={section}
               collection={collection}
               onAdd={handleAdd}
               onRemove={handleRemove}
-              expanded={!!expanded['initial']}
-              onToggle={() => toggle('initial')}
+              expanded={!!expanded[sKey]}
+              onToggle={() => toggle(sKey)}
             />
           );
         }
