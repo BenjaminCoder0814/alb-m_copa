@@ -10,12 +10,13 @@ const BLUE   = '#002776';
 const BG_DARK = '#011a07';
 
 // ─── StickerCell ────────────────────────────────────────────────────────────
-function StickerCell({ code, qty, onAdd, onRemove }) {
+function StickerCell({ code, qty, onAdd, onRemove, readOnly = false }) {
   const holdRef = useRef(null);
   const didHold = useRef(false);
   const [holding, setHolding] = useState(false);
 
   const startHold = () => {
+    if (readOnly) return;
     didHold.current = false;
     setHolding(true);
     holdRef.current = setTimeout(() => {
@@ -31,6 +32,7 @@ function StickerCell({ code, qty, onAdd, onRemove }) {
   };
 
   const handleClick = () => {
+    if (readOnly) return;
     if (!didHold.current) onAdd(code);
     didHold.current = false;
   };
@@ -58,9 +60,9 @@ function StickerCell({ code, qty, onAdd, onRemove }) {
       onTouchStart={startHold}
       onTouchEnd={endHold}
       onClick={handleClick}
-      style={{ background: bg, border: holding ? '1px solid #ef4444' : border, color: textColor, position: 'relative', overflow: 'hidden' }}
-      className="w-7 h-7 rounded-md text-[10px] font-black flex items-center justify-center shrink-0 select-none transition-colors duration-100 active:scale-90 cursor-pointer"
-      title={`${code} — ${!qty ? 'falta' : qty === 1 ? 'tenho' : `repetida x${qty}`}\nClique para adicionar • Segure para remover`}
+      style={{ background: bg, border: holding ? '1px solid #ef4444' : border, color: textColor, position: 'relative', overflow: 'hidden', cursor: readOnly ? 'default' : 'pointer' }}
+      className="w-7 h-7 rounded-md text-[10px] font-black flex items-center justify-center shrink-0 select-none transition-colors duration-100 active:scale-90"
+      title={`${code} — ${!qty ? 'falta' : qty === 1 ? 'tenho' : `repetida x${qty}`}${readOnly ? '' : '\nClique para adicionar • Segure para remover'}`}
     >
       <AnimatePresence>
         {holding && (
@@ -86,7 +88,7 @@ function StickerCell({ code, qty, onAdd, onRemove }) {
 }
 
 // ─── CountryRow ─────────────────────────────────────────────────────────────
-function CountryRow({ country, collection, onAdd, onRemove }) {
+function CountryRow({ country, collection, onAdd, onRemove, readOnly = false }) {
   const { name, code, flag, stickers } = country;
   const owned = Array.from({ length: stickers }, (_, i) => collection[`${code}${i + 1}`] ? 1 : 0)
     .reduce((s, v) => s + v, 0);
@@ -125,6 +127,7 @@ function CountryRow({ country, collection, onAdd, onRemove }) {
                 qty={collection[sCode] || 0}
                 onAdd={onAdd}
                 onRemove={onRemove}
+                readOnly={readOnly}
               />
             </div>
           );
@@ -135,7 +138,7 @@ function CountryRow({ country, collection, onAdd, onRemove }) {
 }
 
 // ─── InitialSection ──────────────────────────────────────────────────────────
-function InitialSection({ section, collection, onAdd, onRemove, expanded, onToggle }) {
+function InitialSection({ section, collection, onAdd, onRemove, expanded, onToggle, readOnly = false }) {
   return (
     <div className="rounded-2xl overflow-hidden mb-3" style={{ border: `1px solid rgba(201,168,76,0.3)` }}>
       {/* Header */}
@@ -179,7 +182,7 @@ function InitialSection({ section, collection, onAdd, onRemove, expanded, onTogg
                         <p className="text-xs font-bold text-white">{s.name}</p>
                         <p className="text-[9px] text-white/40">{code}</p>
                       </div>
-                      <StickerCell code={code} qty={qty} onAdd={onAdd} onRemove={onRemove} />
+                      <StickerCell code={code} qty={qty} onAdd={onAdd} onRemove={onRemove} readOnly={readOnly} />
                     </div>
                   );
                 })
@@ -193,7 +196,7 @@ function InitialSection({ section, collection, onAdd, onRemove, expanded, onTogg
 }
 
 // ─── GroupSection ────────────────────────────────────────────────────────────
-function GroupSection({ section, collection, onAdd, onRemove, expanded, onToggle }) {
+function GroupSection({ section, collection, onAdd, onRemove, expanded, onToggle, readOnly = false }) {
   const { group, groupCode, color = GREEN, countries } = section;
   const totalGroup = countries.reduce((s, c) => s + c.stickers, 0);
   const ownedGroup = countries.reduce((sum, c) => {
@@ -269,6 +272,7 @@ function GroupSection({ section, collection, onAdd, onRemove, expanded, onToggle
                   collection={collection}
                   onAdd={onAdd}
                   onRemove={onRemove}
+                  readOnly={readOnly}
                 />
               ))}
             </div>
@@ -368,7 +372,7 @@ function Legend() {
 }
 
 // ─── AlbumView (main) ─────────────────────────────────────────────────────────
-export default function AlbumView() {
+export default function AlbumView({ readOnly = false }) {
   const { collection, addStickers, removeSticker } = useCollection();
   const [expanded, setExpanded] = useState({ 'Página Inicial': true });
 
@@ -403,6 +407,7 @@ export default function AlbumView() {
             <div className="flex items-center gap-1.5 mb-0.5">
               <span className="text-base">📒</span>
               <span className="text-[10px] font-black uppercase tracking-widest" style={{ color: YELLOW }}>Álbum Completo</span>
+              {readOnly && <span className="text-[9px] px-1.5 py-0.5 rounded-full font-bold" style={{ background: 'rgba(255,255,255,0.1)', color: 'rgba(255,255,255,0.5)' }}>👁 Visualização</span>}
             </div>
             <h2 className="text-xl font-black text-white">Copa do Mundo 2026</h2>
           </div>
@@ -424,7 +429,7 @@ export default function AlbumView() {
       </motion.div>
 
       {/* ── Quick Add ── */}
-      <QuickAddInput onAdd={handleAdd} />
+      {!readOnly && <QuickAddInput onAdd={handleAdd} />}
 
       {/* ── Legend ── */}
       <Legend />
@@ -466,6 +471,7 @@ export default function AlbumView() {
               onRemove={handleRemove}
               expanded={!!expanded[sKey]}
               onToggle={() => toggle(sKey)}
+              readOnly={readOnly}
             />
           );
         }
@@ -478,6 +484,7 @@ export default function AlbumView() {
             onRemove={handleRemove}
             expanded={!!expanded[section.groupCode]}
             onToggle={() => toggle(section.groupCode)}
+            readOnly={readOnly}
           />
         );
       })}

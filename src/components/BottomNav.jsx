@@ -1,18 +1,27 @@
 ﻿import { motion } from 'framer-motion';
+import { LogOut } from 'lucide-react';
 
 const GREEN = '#009C3B';
 const YELLOW = '#FFDF00';
 
-const TABS = [
+const ADMIN_TABS = [
   { id: 'dashboard', label: 'Inicio',    icon: '🏠' },
   { id: 'input',     label: 'Adicionar', icon: '➕' },
   { id: 'album',     label: 'Album',     icon: '📗' },
   { id: 'dupes',     label: 'Repetidas', icon: '🔄' },
   { id: 'missing',   label: 'Faltando',  icon: '🔍' },
   { id: 'reports',   label: 'Stats',     icon: '📊' },
+  { id: 'reservas',  label: 'Reservas',  icon: '📋' },
 ];
 
-export default function BottomNav({ active, onNavigate }) {
+const GUEST_TABS = [
+  { id: 'album',    label: 'Álbum',    icon: '📗' },
+  { id: 'trocar',   label: 'Trocar',   icon: '🔄' },
+  { id: 'reservas', label: 'Reservas', icon: '📋' },
+];
+
+export default function BottomNav({ active, onNavigate, role, onLogout }) {
+  const TABS = role === 'trocar' ? GUEST_TABS : ADMIN_TABS;
   return (
     <nav
       className="fixed bottom-0 left-0 right-0 z-40 pb-safe"
@@ -59,6 +68,15 @@ export default function BottomNav({ active, onNavigate }) {
             </motion.button>
           );
         })}
+        {/* Logout button */}
+        <motion.button
+          onClick={onLogout}
+          whileTap={{ scale: 0.85 }}
+          className="flex flex-col items-center justify-center flex-1 h-full gap-0.5"
+        >
+          <LogOut size={16} color="rgba(255,255,255,0.25)" />
+          <span className="text-[9px] font-bold" style={{ color: 'rgba(255,255,255,0.25)' }}>Sair</span>
+        </motion.button>
       </div>
     </nav>
   );
