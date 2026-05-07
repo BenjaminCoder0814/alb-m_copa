@@ -1,40 +1,24 @@
 ﻿import { useState, useRef, useCallback } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Search, ChevronDown, ChevronRight } from 'lucide-react';
+import { Search, ChevronDown, ChevronRight, Plus, Minus } from 'lucide-react';
 import { useCollection } from '../store/CollectionContext';
 import { albumStructure } from '../data/stickers';
 
 const GREEN  = '#009C3B';
 const YELLOW = '#FFDF00';
 const BLUE   = '#002776';
+const RED    = '#ef4444';
 const BG_DARK = '#011a07';
 
 // ─── StickerCell ────────────────────────────────────────────────────────────
-function StickerCell({ code, qty, onAdd, onRemove, readOnly = false }) {
-  const holdRef = useRef(null);
-  const didHold = useRef(false);
-  const [holding, setHolding] = useState(false);
-
-  const startHold = () => {
-    if (readOnly) return;
-    didHold.current = false;
-    setHolding(true);
-    holdRef.current = setTimeout(() => {
-      didHold.current = true;
-      setHolding(false);
-      onRemove(code);
-    }, 600);
-  };
-
-  const endHold = () => {
-    clearTimeout(holdRef.current);
-    setHolding(false);
-  };
-
+function StickerCell({ code, qty, onAdd, onRemove, readOnly = false, mode = 'add' }) {
   const handleClick = () => {
     if (readOnly) return;
-    if (!didHold.current) onAdd(code);
-    didHold.current = false;
+    if (mode === 'remove') {
+      if (qty > 0) onRemove(code);
+    } else {
+      onAdd(code);
+    }
   };
 
   let bg, textColor, border;
@@ -52,43 +36,31 @@ function StickerCell({ code, qty, onAdd, onRemove, readOnly = false }) {
     border = `1px solid ${YELLOW}`;
   }
 
+  // Em modo remover, destacar com borda vermelha as células com qty>0
+  const borderFinal = (!readOnly && mode === 'remove' && qty > 0) ? `1.5px solid ${RED}` : border;
+
   return (
     <button
-      onMouseDown={startHold}
-      onMouseUp={endHold}
-      onMouseLeave={endHold}
-      onTouchStart={startHold}
-      onTouchEnd={endHold}
       onClick={handleClick}
-      style={{ background: bg, border: holding ? '1px solid #ef4444' : border, color: textColor, position: 'relative', overflow: 'hidden', cursor: readOnly ? 'default' : 'pointer' }}
-      className="w-7 h-7 rounded-md text-[10px] font-black flex items-center justify-center shrink-0 select-none transition-colors duration-100 active:scale-90"
-      title={`${code} — ${!qty ? 'falta' : qty === 1 ? 'tenho' : `repetida x${qty}`}${readOnly ? '' : '\nClique para adicionar • Segure para remover'}`}
+      style={{
+        background: bg,
+        border: borderFinal,
+        color: textColor,
+        position: 'relative',
+        overflow: 'hidden',
+        cursor: readOnly ? 'default' : (mode === 'remove' && qty === 0 ? 'not-allowed' : 'pointer'),
+        opacity: (!readOnly && mode === 'remove' && qty === 0) ? 0.4 : 1,
+      }}
+      className="w-7 h-7 rounded-md text-[10px] font-black flex items-center justify-center shrink-0 select-none transition-all duration-100 active:scale-90"
+      title={`${code} — ${!qty ? 'falta' : qty === 1 ? 'tenho' : `repetida x${qty}`}${readOnly ? '' : `\nClique para ${mode === 'remove' ? 'remover' : 'adicionar'}`}`}
     >
-      <AnimatePresence>
-        {holding && (
-          <motion.div
-            key="hold-fill"
-            initial={{ scaleX: 0 }}
-            animate={{ scaleX: 1 }}
-            transition={{ duration: 0.6, ease: 'linear' }}
-            style={{
-              position: 'absolute',
-              inset: 0,
-              background: 'rgba(239,68,68,0.55)',
-              transformOrigin: 'left center',
-              zIndex: 0,
-              borderRadius: 'inherit',
-            }}
-          />
-        )}
-      </AnimatePresence>
       <span style={{ position: 'relative', zIndex: 1 }}>{qty > 1 ? qty : ''}</span>
     </button>
   );
 }
 
 // ─── CountryRow ─────────────────────────────────────────────────────────────
-function CountryRow({ country, collection, onAdd, onRemove, readOnly = false }) {
+function CountryRow({ country, collection, onAdd, onRemove, readOnly = false, mode = 'add' }) {
   const { name, code, flag, stickers } = country;
   const owned = Array.from({ length: stickers }, (_, i) => collection[`${code}${i + 1}`] ? 1 : 0)
     .reduce((s, v) => s + v, 0);
@@ -128,6 +100,7 @@ function CountryRow({ country, collection, onAdd, onRemove, readOnly = false }) 
                 onAdd={onAdd}
                 onRemove={onRemove}
                 readOnly={readOnly}
+                mode={mode}
               />
             </div>
           );
@@ -138,7 +111,7 @@ function CountryRow({ country, collection, onAdd, onRemove, readOnly = false }) 
 }
 
 // ─── InitialSection ──────────────────────────────────────────────────────────
-function InitialSection({ section, collection, onAdd, onRemove, expanded, onToggle, readOnly = false }) {
+function InitialSection({ section, collection, onAdd, onRemove, expanded, onToggle, readOnly = false, mode = 'add' }) {
   return (
     <div className="rounded-2xl overflow-hidden mb-3" style={{ border: `1px solid rgba(201,168,76,0.3)` }}>
       {/* Header */}
@@ -185,7 +158,7 @@ function InitialSection({ section, collection, onAdd, onRemove, expanded, onTogg
                         <p className="text-xs font-bold text-white">{s.name}</p>
                         <p className="text-[9px] text-white/40">{code}</p>
                       </div>
-                      <StickerCell code={code} qty={qty} onAdd={onAdd} onRemove={onRemove} readOnly={readOnly} />
+                      <StickerCell code={code} qty={qty} onAdd={onAdd} onRemove={onRemove} readOnly={readOnly} mode={mode} />
                     </div>
                   );
                 })
@@ -199,7 +172,7 @@ function InitialSection({ section, collection, onAdd, onRemove, expanded, onTogg
 }
 
 // ─── GroupSection ────────────────────────────────────────────────────────────
-function GroupSection({ section, collection, onAdd, onRemove, expanded, onToggle, readOnly = false }) {
+function GroupSection({ section, collection, onAdd, onRemove, expanded, onToggle, readOnly = false, mode = 'add' }) {
   const { group, groupCode, color = GREEN, countries } = section;
   const totalGroup = countries.reduce((s, c) => s + c.stickers, 0);
   const ownedGroup = countries.reduce((sum, c) => {
@@ -276,6 +249,7 @@ function GroupSection({ section, collection, onAdd, onRemove, expanded, onToggle
                   onAdd={onAdd}
                   onRemove={onRemove}
                   readOnly={readOnly}
+                  mode={mode}
                 />
               ))}
             </div>
@@ -369,7 +343,6 @@ function Legend() {
         <div className="w-5 h-5 rounded" style={{ background: 'rgba(255,255,255,0.06)', border: '1px solid rgba(255,255,255,0.08)' }} />
         <span className="text-[10px] text-white/50">Falta</span>
       </div>
-      <span className="text-[9px] ml-auto font-bold" style={{ color: 'rgba(239,68,68,0.6)' }}>🔴 Segure = remover</span>
     </div>
   );
 }
@@ -378,6 +351,7 @@ function Legend() {
 export default function AlbumView({ readOnly = false }) {
   const { collection, addStickers, removeSticker } = useCollection();
   const [expanded, setExpanded] = useState({ 'Página Inicial': true });
+  const [mode, setMode] = useState('add'); // 'add' ou 'remove'
 
   const toggle = useCallback((key) => {
     setExpanded((prev) => ({ ...prev, [key]: !prev[key] }));
@@ -438,6 +412,38 @@ export default function AlbumView({ readOnly = false }) {
       {/* ── Quick Add ── */}
       {!readOnly && <QuickAddInput onAdd={handleAdd} />}
 
+      {/* ── Modo Adicionar / Remover ── */}
+      {!readOnly && (
+        <div className="flex gap-2 mb-3 p-1 rounded-2xl" style={{ background: 'rgba(255,255,255,0.05)', border: '1px solid rgba(255,255,255,0.08)' }}>
+          <motion.button whileTap={{ scale: 0.96 }} onClick={() => setMode('add')}
+            className="flex-1 py-2.5 rounded-xl text-xs font-black flex items-center justify-center gap-1.5 transition-all"
+            style={{
+              background: mode === 'add' ? `linear-gradient(135deg, #005c27, ${GREEN})` : 'transparent',
+              color: mode === 'add' ? 'white' : 'rgba(255,255,255,0.5)',
+              boxShadow: mode === 'add' ? `0 4px 12px ${GREEN}55` : 'none',
+            }}>
+            <Plus size={14} /> Adicionar
+          </motion.button>
+          <motion.button whileTap={{ scale: 0.96 }} onClick={() => setMode('remove')}
+            className="flex-1 py-2.5 rounded-xl text-xs font-black flex items-center justify-center gap-1.5 transition-all"
+            style={{
+              background: mode === 'remove' ? `linear-gradient(135deg, #b91c1c, ${RED})` : 'transparent',
+              color: mode === 'remove' ? 'white' : 'rgba(255,255,255,0.5)',
+              boxShadow: mode === 'remove' ? `0 4px 12px ${RED}55` : 'none',
+            }}>
+            <Minus size={14} /> Remover
+          </motion.button>
+        </div>
+      )}
+
+      {/* ── Aviso modo remover ── */}
+      {!readOnly && mode === 'remove' && (
+        <motion.p initial={{ opacity: 0 }} animate={{ opacity: 1 }}
+          className="text-[11px] text-center mb-3 font-bold" style={{ color: RED }}>
+          🗑️ Modo remover ativado — toque nas figurinhas (vermelhas) para tirar 1 cópia
+        </motion.p>
+      )}
+
       {/* ── Legend ── */}
       <Legend />
 
@@ -479,6 +485,7 @@ export default function AlbumView({ readOnly = false }) {
               expanded={!!expanded[sKey]}
               onToggle={() => toggle(sKey)}
               readOnly={readOnly}
+              mode={mode}
             />
           );
         }
@@ -492,6 +499,7 @@ export default function AlbumView({ readOnly = false }) {
             expanded={!!expanded[section.groupCode]}
             onToggle={() => toggle(section.groupCode)}
             readOnly={readOnly}
+            mode={mode}
           />
         );
       })}
